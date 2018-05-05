@@ -10,6 +10,7 @@ from time import sleep
 from requests import get
 from bs4 import BeautifulSoup as Soup
 from time import time
+from nltk.corpus import stopwords
 
 
 def run_cash_show_assistant():
@@ -18,7 +19,7 @@ def run_cash_show_assistant():
 	csAnswer2 = ImageGrab.grab(bbox=(48,376,312,427))
 	csAnswer3 = ImageGrab.grab(bbox=(48,444,312,495))
 
-	# load the example image and pre-process to reduce noise 
+	# load the example image and pre-process to reduce noise
 	# and increase contrast
 	def pre_process_image(img):
 		img = img.filter(ImageFilter.MedianFilter())
@@ -47,6 +48,17 @@ def run_cash_show_assistant():
 	    text = '\n'.join(chunk for chunk in chunks if chunk)
 	    return text
 
+	def hash_count(html_str, answer):
+		#filter out stop words in answers
+		stop_words = stopwords.words('english')
+		counter = 0
+		answer_arr = answer.split()
+		answer_arr = [w for w in answer_arr if not w in stop_words]
+		print(answer_arr)
+		for word in answer_arr:
+			counter = counter + html_str.count(word)
+		return counter
+
 	csQuestion = pre_process_image(csQuestion)
 	question = convert_image_to_text(csQuestion)
 	question = unidecode(question.split("?", 1)[0])
@@ -65,12 +77,12 @@ def run_cash_show_assistant():
 
 	# -------------- Testing -----------------
 
-	# question = "In 1999, footballer David Beckham married which 'Spice Gifl'"
-	# answer1 = "scary spice"
-	# answer2 = "posh spice"
-	# answer3 = "ginger spice"
+	# question = "What was used to create the communication device Liam Neeson used on screen in Star Wars: Episode 1"
+	# answer1 = "women's razor"
+	# answer2 = "a talking board"
+	# answer3 = "a harmonica"
 
-	# ----------------------------------------
+	# ---------------------------------------
 
 	question = question.replace(" ", "+")
 	question = question.replace("&", "%26")
@@ -91,6 +103,11 @@ def run_cash_show_assistant():
 	count1 = html.count(answer1)
 	count2 = html.count(answer2)
 	count3 = html.count(answer3)
+
+	# Count instances of answer using hash method
+	count1 = count1 + hash_count(html, answer1)
+	count2 = count2 + hash_count(html, answer2)
+	count3 = count3 + hash_count(html, answer3)
 
 	# Write to file to see HTML
 	# text_file = open("Output.txt", "w")
