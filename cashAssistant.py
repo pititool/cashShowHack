@@ -4,7 +4,7 @@ import webbrowser
 import random
 import re
 from unidecode import unidecode
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from PIL import Image, ImageEnhance, ImageFilter
 from time import sleep
 from requests import get
@@ -13,9 +13,6 @@ from time import time
 
 
 def run_cash_show_assistant():
-
-	# t0 = time()
-
 	csQuestion = ImageGrab.grab(bbox=(16,168, 342, 288))
 	csAnswer1 = ImageGrab.grab(bbox=(50,306,310,358))
 	csAnswer2 = ImageGrab.grab(bbox=(48,376,312,427))
@@ -36,6 +33,20 @@ def run_cash_show_assistant():
 		text = text.replace("\n", " ")
 		return text
 
+	def clean_me(html):
+	    soup = Soup(html, "html.parser") # create a new bs4 object from the html data loaded
+	    for script in soup(["script", "style"]): # remove all javascript and stylesheet code
+	        script.extract()
+	    # get text
+	    text = soup.get_text()
+	    # break into lines and remove leading and trailing space on each
+	    lines = (line.strip() for line in text.splitlines())
+	    # break multi-headlines into a line each
+	    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+	    # drop blank lines
+	    text = '\n'.join(chunk for chunk in chunks if chunk)
+	    return text
+
 	csQuestion = pre_process_image(csQuestion)
 	question = convert_image_to_text(csQuestion)
 	question = unidecode(question.split("?", 1)[0])
@@ -54,10 +65,10 @@ def run_cash_show_assistant():
 
 	# -------------- Testing -----------------
 
-	question = "What is the largest tectonic plate"
-	answer1 = "carnations"
-	answer2 = "the eurasyian plate"
-	answer3 = "the pacific plate"
+	# question = "In 1999, footballer David Beckham married which 'Spice Gifl'"
+	# answer1 = "scary spice"
+	# answer2 = "posh spice"
+	# answer3 = "ginger spice"
 
 	# ----------------------------------------
 
@@ -69,14 +80,12 @@ def run_cash_show_assistant():
 	html = responseFromQuestion.text.lower()
 
 	# Change HTML to punctuation encoding to actul punctuation
-	html = h.unescape(html).encode('utf-8')
-	
+	html = h.unescape(html)
+	html = clean_me(html)
+
 	# Get rid of HTML tags in HTML output
 	cleanr = re.compile('<.*?>')
 	html = re.sub(cleanr, '', html)
-
-	# Open website 
-	# webbrowser.open("https://google.com/search?q=" + question)
 
 	# Count instances of answer and lower-case answer
 	count1 = html.count(answer1)
@@ -84,18 +93,26 @@ def run_cash_show_assistant():
 	count3 = html.count(answer3)
 
 	# Write to file to see HTML
-	text_file = open("Output.txt", "w")
-	text_file.write(html)
-	text_file.close()
+	# text_file = open("Output.txt", "w")
+	# text_file.write(html)
+	# text_file.close()
 
-	# if count1 == 0 and count2 == 0 and count3 == 0:
-	# 	print("Re-Attempting, first try resulted in 0s, taking first word without articles")
-	# 	answer1 = re.sub('(\s+)(a|an|and|the)(\s+)', '\1\3', answer1)
-	# 	answer2 = re.sub('(\s+)(a|an|and|the)(\s+)', '\1\3', answer2)
-	# 	answer3 = re.sub('(\s+)(a|an|and|the)(\s+)', '\1\3', answer3)
-	# 	count1 = html.count(answer1.split(" ", 1)[0])
-	# 	count2 = html.count(answer2.split(" ", 1)[0])
-	# 	count3 = html.count(answer3.split(" ", 1)[0])
+	if count1 == 0 and count2 == 0 and count3 == 0:
+		print(" --------------------- ")
+		print("RE-ATTEMPTING, first try resulted in 0s, taking first word without articles")
+		singleAnswer1 = answer1.split(" ", 1)[0]
+		if singleAnswer1 == "a" or singleAnswer1 == "an" or singleAnswer1 == "the":
+			singleAnswer1 = answer1.split(" ", 1)[1]
+		singleAnswer2 = answer2.split(" ", 1)[0]
+		if singleAnswer2 == "a" or singleAnswer2 == "an" or singleAnswer2 == "the":
+			singleAnswer2 = answer2.split(" ", 1)[1]
+		singleAnswer3 = answer3.split(" ", 1)[0]
+		if singleAnswer3 == "a" or singleAnswer3 == "an" or singleAnswer3 == "the":
+			singleAnswer3 = answer3.split(" ", 1)[1]
+
+		count1 = html.count(answer1.split(" ", 1)[0])
+		count2 = html.count(answer2.split(" ", 1)[0])
+		count3 = html.count(answer3.split(" ", 1)[0])
 
 	print(count1)
 	print(count2)
@@ -117,9 +134,8 @@ def run_cash_show_assistant():
 			print("Answer is: 2 - " + answer2)
 		if maxCount == count3:
 			print("Answer is: 3 - " + answer3)
-			
+
+	# t0 = time()
 	# t1 = time()
-
 	# print("Program takes %f" %(t1-t0))
-
 run_cash_show_assistant()
