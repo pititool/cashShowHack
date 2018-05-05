@@ -10,8 +10,6 @@ from time import sleep
 from requests import get
 from bs4 import BeautifulSoup as Soup
 from time import time
-from nltk.corpus import stopwords
-
 
 def run_cash_show_assistant():
 	csQuestion = ImageGrab.grab(bbox=(16,168, 342, 288))
@@ -50,11 +48,12 @@ def run_cash_show_assistant():
 
 	def hash_count(html_str, answer):
 		#filter out stop words in answers
-		stop_words = stopwords.words('english')
+		stop_words = ['the', 'a', 'an', 'is', 'are', 'to', 'from', 'in', 
+		'and', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'he', 'it', 
+		'its', 'of', 'on', 'that', 'to', 'was', 'were', 'will', 'with']
 		counter = 0
 		answer_arr = answer.split()
 		answer_arr = [w for w in answer_arr if not w in stop_words]
-		print(answer_arr)
 		for word in answer_arr:
 			counter = counter + html_str.count(word)
 		return counter
@@ -104,11 +103,6 @@ def run_cash_show_assistant():
 	count2 = html.count(answer2)
 	count3 = html.count(answer3)
 
-	# Count instances of answer using hash method
-	count1 = count1 + hash_count(html, answer1)
-	count2 = count2 + hash_count(html, answer2)
-	count3 = count3 + hash_count(html, answer3)
-
 	# Write to file to see HTML
 	# text_file = open("Output.txt", "w")
 	# text_file.write(html)
@@ -116,20 +110,10 @@ def run_cash_show_assistant():
 
 	if count1 == 0 and count2 == 0 and count3 == 0:
 		print(" --------------------- ")
-		print("RE-ATTEMPTING, first try resulted in 0s, taking first word without articles")
-		singleAnswer1 = answer1.split(" ", 1)[0]
-		if singleAnswer1 == "a" or singleAnswer1 == "an" or singleAnswer1 == "the":
-			singleAnswer1 = answer1.split(" ", 1)[1]
-		singleAnswer2 = answer2.split(" ", 1)[0]
-		if singleAnswer2 == "a" or singleAnswer2 == "an" or singleAnswer2 == "the":
-			singleAnswer2 = answer2.split(" ", 1)[1]
-		singleAnswer3 = answer3.split(" ", 1)[0]
-		if singleAnswer3 == "a" or singleAnswer3 == "an" or singleAnswer3 == "the":
-			singleAnswer3 = answer3.split(" ", 1)[1]
-
-		count1 = html.count(answer1.split(" ", 1)[0])
-		count2 = html.count(answer2.split(" ", 1)[0])
-		count3 = html.count(answer3.split(" ", 1)[0])
+		print("RE-ATTEMPTING")
+		count1 = hash_count(html, answer1)
+		count2 = hash_count(html, answer2)
+		count3 = hash_count(html, answer3)
 
 	print(count1)
 	print(count2)
@@ -152,7 +136,4 @@ def run_cash_show_assistant():
 		if maxCount == count3:
 			print("Answer is: 3 - " + answer3)
 
-	# t0 = time()
-	# t1 = time()
-	# print("Program takes %f" %(t1-t0))
 run_cash_show_assistant()
