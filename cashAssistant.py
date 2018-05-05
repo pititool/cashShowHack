@@ -3,6 +3,7 @@ import pytesseract
 import webbrowser
 import random
 import re
+import string
 from unidecode import unidecode
 from html.parser import HTMLParser
 from PIL import Image, ImageEnhance, ImageFilter
@@ -31,6 +32,17 @@ def run_cash_show_assistant():
 		text = pytesseract.image_to_string(Image.open('temp.jpg'))
 		text = text.replace("\n", " ")
 		return text
+
+	def clean_html(html):
+		# Change HTML to punctuation encoding to actul punctuation
+		html = h.unescape(html)
+		html = clean_me(html)
+
+		# Get rid of HTML tags in HTML output
+		cleanr = re.compile('<.*?>')
+		html = re.sub(cleanr, '', html)
+		html = re.sub(r'[^\w\s]', '',html)
+		return html
 
 	def clean_me(html):
 	    soup = Soup(html, "html.parser") # create a new bs4 object from the html data loaded
@@ -69,6 +81,9 @@ def run_cash_show_assistant():
 	answer1 = unidecode(convert_image_to_text(csAnswer1).strip().lower())
 	answer2 = unidecode(convert_image_to_text(csAnswer2).strip().lower())
 	answer3 = unidecode(convert_image_to_text(csAnswer3).strip().lower())
+	answer1 = re.sub(r'[^\w\s]', '',answer1)
+	answer2 = re.sub(r'[^\w\s]', '',answer2)
+	answer3 = re.sub(r'[^\w\s]', '',answer3)
 
 	print(answer1)
 	print(answer2)
@@ -76,10 +91,10 @@ def run_cash_show_assistant():
 
 	# -------------- Testing -----------------
 
-	# question = "What was used to create the communication device Liam Neeson used on screen in Star Wars: Episode 1"
-	# answer1 = "women's razor"
-	# answer2 = "a talking board"
-	# answer3 = "a harmonica"
+	# question = "Approximately when was the Bust of Nefertiti created"
+	# answer1 = "1789 bc"
+	# answer2 = "1345 bc"
+	# answer3 = "62 ad"
 
 	# ---------------------------------------
 
@@ -89,14 +104,7 @@ def run_cash_show_assistant():
 	responseFromQuestion = get("https://google.com/search?q=" + question)
 	h = HTMLParser()
 	html = responseFromQuestion.text.lower()
-
-	# Change HTML to punctuation encoding to actul punctuation
-	html = h.unescape(html)
-	html = clean_me(html)
-
-	# Get rid of HTML tags in HTML output
-	cleanr = re.compile('<.*?>')
-	html = re.sub(cleanr, '', html)
+	html = clean_html(html)
 
 	# Count instances of answer and lower-case answer
 	count1 = html.count(answer1)
