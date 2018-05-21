@@ -5,31 +5,38 @@ import random
 import re
 import string
 from unidecode import unidecode
-from html.parser import HTMLParser
+from HTMLParser import HTMLParser
 from PIL import Image, ImageEnhance, ImageFilter
-from time import sleep
+from time import sleep, time, strftime
 from requests import get
 from bs4 import BeautifulSoup as Soup
-from time import time
+from nltk.corpus import stopwords
+from datetime import datetime
 
 def run_cash_show_assistant():
-	csQuestion = ImageGrab.grab(bbox=(16,168, 342, 288))
-	csAnswer1 = ImageGrab.grab(bbox=(50,306,310,358))
+	#if __name__ == '__main__':
+	
+	f_debug = 1   #activation du log
+	
+	csQuestion = ImageGrab.grab(bbox=(16,180, 342, 300))
+	csAnswer1 = ImageGrab.grab(bbox=(50,310,310,358))
 	csAnswer2 = ImageGrab.grab(bbox=(48,376,312,427))
 	csAnswer3 = ImageGrab.grab(bbox=(48,444,312,495))
+	#csQuestion.show()	
 
 	# load the example image and pre-process to reduce noise
 	# and increase contrast
 	def pre_process_image(img):
-		img = img.filter(ImageFilter.MedianFilter())
-		enhancer = ImageEnhance.Contrast(img)
-		img = enhancer.enhance(2)
-		img = img.convert('1')
+		#img = img.filter(ImageFilter.MedianFilter())
+		#enhancer = ImageEnhance.Contrast(img)
+		#img = enhancer.enhance(2)
+		#img = img.convert('1')
+		#img.show()      #Pour afficher l image decoupee
 		return img
 
 	def convert_image_to_text(img):
-		img.save('temp.jpg')
-		text = pytesseract.image_to_string(Image.open('temp.jpg'))
+		img.save('temp.bmp')
+		text = pytesseract.image_to_string(Image.open('temp.bmp'))
 		text = text.replace("\n", " ")
 		return text
 
@@ -58,7 +65,7 @@ def run_cash_show_assistant():
 	    text = '\n'.join(chunk for chunk in chunks if chunk)
 	    return text
 
-	def hash_count(html_str, answer):
+	"""def hash_count(html_str, answer):
 		#filter out stop words in answers
 		stop_words = ['the', 'a', 'an', 'is', 'are', 'to', 'from', 'in', 
 		'and', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'he', 'it', 
@@ -68,8 +75,24 @@ def run_cash_show_assistant():
 		answer_arr = [w for w in answer_arr if not w in stop_words]
 		for word in answer_arr:
 			counter = counter + html_str.count(word)
+		return counter"""
+
+	def hash_count(html_str, answer):
+		#filter out stop words in answers
+		stop_words = stopwords.words('english')
+		counter = 0
+		answer_arr = answer.split()
+		answer_arr = [w for w in answer_arr if not w in stop_words]
+		print(answer_arr)
+		for word in answer_arr:
+			counter = counter + html_str.count(word)
 		return counter
 
+    #Ouverture du fichier de log
+	if f_debug == 1:
+		text_file = open("Output.txt", "a")
+		text_file.write("\n===== lancement "+str(datetime.now())+" ====\n")      #log
+			
 	csQuestion = pre_process_image(csQuestion)
 	question = convert_image_to_text(csQuestion)
 	question = unidecode(question.split("?", 1)[0])
@@ -88,6 +111,12 @@ def run_cash_show_assistant():
 	print(answer1)
 	print(answer2)
 	print(answer3)
+
+	if f_debug == 1:
+		text_file.write(question+"\n")  #log
+		text_file.write(answer1+"\n")   #log
+		text_file.write(answer2+"\n")   #log
+		text_file.write(answer3+"\n")   #log
 
 	# -------------- Testing -----------------
 
@@ -111,10 +140,14 @@ def run_cash_show_assistant():
 	count2 = html.count(answer2)
 	count3 = html.count(answer3)
 
-	# Write to file to see HTML
-	# text_file = open("Output.txt", "w")
-	# text_file.write(html)
-	# text_file.close()
+	# Count instances of answer using hash method
+	count1 = count1 + hash_count(html, answer1)
+	count2 = count2 + hash_count(html, answer2)
+	count3 = count3 + hash_count(html, answer3)
+
+	# Write to logfile to see HTML
+	#if f_debug == 1:
+		#text_file.write(html+"\n")
 
 	if count1 == 0 and count2 == 0 and count3 == 0:
 		print(" --------------------- ")
@@ -126,7 +159,7 @@ def run_cash_show_assistant():
 	print(count1)
 	print(count2)
 	print(count3)
-
+	
 	if question.find("+not+") != -1 or question.find("+NOT+") != -1:
 		minCount = min(count1, count2, count3)
 		if minCount == count1:
@@ -144,4 +177,12 @@ def run_cash_show_assistant():
 		if maxCount == count3:
 			print("Answer is: 3 - " + answer3)
 
-run_cash_show_assistant()
+	if f_debug == 1:
+		text_file.write(str(count1)+"\n")   #log
+		text_file.write(str(count2)+"\n")   #log
+		text_file.write(str(count3)+"\n")   #log
+		text_file.write("===== fermeture "+str(datetime.now())+" ====\n\n")      #log
+		text_file.close()
+			
+if __name__ == '__main__':
+	run_cash_show_assistant()
