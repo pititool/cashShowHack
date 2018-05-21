@@ -1,0 +1,18 @@
+TO DO LIST :
+
+	- Utiliser l'API de recherche Google plutôt que le passage par https://google.com/search?
+	- Optimiser les algo de recherches /// rechercher avec les réponses plutôt que de parser le flux de réponse de la question
+		Pistes :
+			https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed16365
+			https://medium.com/@LtHummus/i-also-wrote-a-bot-for-hq-trivia-7c9932a9c6d4
+	- Ajouter la lecture d'un fichier de config contenant les coordonnées des questions/réponses selon le jeu et le smartphone utilisé
+	- Jeux à gérer : 
+		English :
+			HQ (3 réponses)
+			CashShow (3 réponses)
+			The Q (3 réponses)
+		Français => Donc gérer les recherches en français :
+			CashShow (3 réponses)
+			Flashbreak (4 réponses)
+	- Avoir une boucle qui permet de relancer la recherche automatiquement ou après un sleep de X secondes
+	- Faire une petite interface sexy ...
