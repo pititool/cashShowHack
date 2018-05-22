@@ -7,17 +7,21 @@ import string
 from unidecode import unidecode
 from HTMLParser import HTMLParser
 from PIL import Image, ImageEnhance, ImageFilter
-from time import sleep, time
+from time import sleep, time, strftime
 from requests import get
 from bs4 import BeautifulSoup as Soup
 from nltk.corpus import stopwords
+from datetime import datetime
 
 def run_cash_show_assistant():
 	#if __name__ == '__main__':
-	csQuestion = ImageGrab.grab(bbox=(16,168, 342, 288))
-	csAnswer1 = ImageGrab.grab(bbox=(50,306,310,358))
-	csAnswer2 = ImageGrab.grab(bbox=(48,376,312,427))
-	csAnswer3 = ImageGrab.grab(bbox=(48,444,312,495))
+	
+	f_debug = 1   #activation du log
+	
+	csQuestion = ImageGrab.grab(bbox=(45,350, 410, 470))
+	csAnswer1 = ImageGrab.grab(bbox=(70,510,390,560))
+	csAnswer2 = ImageGrab.grab(bbox=(70,595,390,640))
+	csAnswer3 = ImageGrab.grab(bbox=(70,670,390,715))
 	#csQuestion.show()	
 
 	# load the example image and pre-process to reduce noise
@@ -83,7 +87,12 @@ def run_cash_show_assistant():
 		for word in answer_arr:
 			counter = counter + html_str.count(word)
 		return counter
-		
+
+    #Ouverture du fichier de log
+	if f_debug == 1:
+		text_file = open("Output.txt", "a")
+		text_file.write("\n===== lancement "+str(datetime.now())+" ====\n")      #log
+			
 	csQuestion = pre_process_image(csQuestion)
 	question = convert_image_to_text(csQuestion)
 	question = unidecode(question.split("?", 1)[0])
@@ -102,6 +111,13 @@ def run_cash_show_assistant():
 	print(answer1)
 	print(answer2)
 	print(answer3)
+
+	if f_debug == 1:
+		text_file.write(question+"\n")  #log
+		text_file.write(answer1+"\n")   #log
+		text_file.write(answer2+"\n")   #log
+		text_file.write(answer3+"\n")   #log
+		text_file.write("\n===== fin de l'ocr "+str(datetime.now())+" ====\n")      #log
 
 	# -------------- Testing -----------------
 
@@ -130,22 +146,21 @@ def run_cash_show_assistant():
 	count2 = count2 + hash_count(html, answer2)
 	count3 = count3 + hash_count(html, answer3)
 
-	# Write to file to see HTML
-	text_file = open("Output.txt", "w")
-	text_file.write(html)
-	text_file.close()
+	# Write to logfile to see HTML
+	#if f_debug == 1:
+		#text_file.write(html+"\n")
 
-	if count1 == 0 and count2 == 0 and count3 == 0:
+	"""if count1 == 0 and count2 == 0 and count3 == 0:
 		print(" --------------------- ")
 		print("RE-ATTEMPTING")
 		count1 = hash_count(html, answer1)
 		count2 = hash_count(html, answer2)
-		count3 = hash_count(html, answer3)
+		count3 = hash_count(html, answer3)"""
 
 	print(count1)
 	print(count2)
 	print(count3)
-
+	
 	if question.find("+not+") != -1 or question.find("+NOT+") != -1:
 		minCount = min(count1, count2, count3)
 		if minCount == count1:
@@ -163,5 +178,12 @@ def run_cash_show_assistant():
 		if maxCount == count3:
 			print("Answer is: 3 - " + answer3)
 
+	if f_debug == 1:
+		text_file.write(str(count1)+"\n")   #log
+		text_file.write(str(count2)+"\n")   #log
+		text_file.write(str(count3)+"\n")   #log
+		text_file.write("===== fermeture "+str(datetime.now())+" ====\n\n")      #log
+		text_file.close()
+			
 if __name__ == '__main__':
 	run_cash_show_assistant()
