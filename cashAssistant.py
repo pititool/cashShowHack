@@ -160,30 +160,45 @@ def run_cash_show_assistant():
 	print(count1)
 	print(count2)
 	print(count3)
-	
-	if question.find("+not+") != -1 or question.find("+NOT+") != -1:
-		minCount = min(count1, count2, count3)
-		if minCount == count1:
-			print("Answer is: 1 - " + answer1)
-		if minCount == count2:
-			print("Answer is: 2 - " + answer2)
-		if minCount == count3:
-			print("Answer is: 3 - " + answer3)
-	else:
-		maxCount = max(count1, count2, count3)
-		if maxCount == count1:
-			print("Answer is: 1 - " + answer1)
-		if maxCount == count2:
-			print("Answer is: 2 - " + answer2)
-		if maxCount == count3:
-			print("Answer is: 3 - " + answer3)
 
 	if f_debug == 1:
 		text_file.write(str(count1)+"\n")   #log
 		text_file.write(str(count2)+"\n")   #log
 		text_file.write(str(count3)+"\n")   #log
-		text_file.write("===== fermeture "+str(datetime.now())+" ====\n\n")      #log
-		text_file.close()
+
+	
+	if question.find("+not+") != -1 or question.find("+NOT+") != -1:
+		minCount = min(count1, count2, count3)
+		if minCount == count1:
+			print("La reponse est : 1 - " + answer1)
+			if f_debug == 1:
+                                text_file.write("La reponse est : 1 - "+str(datetime.now())+" ====\n\n")        #log
+		if minCount == count2:
+			print("La reponse est : 2 - " + answer2)
+			if f_debug == 1:
+                                text_file.write("La reponse est : 2 - "+str(datetime.now())+" ====\n\n")        #log
+		if minCount == count3:
+			print("La reponse est : 3 - " + answer3)
+			if f_debug == 1:
+                                text_file.write("La reponse est : 3 - "+str(datetime.now())+" ====\n\n")        #log
+	else:
+		maxCount = max(count1, count2, count3)
+		if maxCount == count1:
+			print("La reponse est : 1 - " + answer1)
+                        if f_debug == 1:
+                                text_file.write("La reponse est : 1 - "+str(datetime.now())+" ====\n\n")        #log
+		if maxCount == count2:
+			print("La reponse est : 2 - " + answer2)
+			if f_debug == 1:
+                                text_file.write("La reponse est : 2 - "+str(datetime.now())+" ====\n\n")        #log
+		if maxCount == count3:
+			print("La reponse est : 3 - " + answer3)
+			if f_debug == 1:
+                                text_file.write("La reponse est : 3 - "+str(datetime.now())+" ====\n\n")        #log
+
+                if f_debug == 1:
+                        text_file.write("===== fermeture "+str(datetime.now())+" ====\n\n")      #log
+        		text_file.close()
 			
 if __name__ == '__main__':
 	run_cash_show_assistant()
