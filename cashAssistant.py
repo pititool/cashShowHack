@@ -172,29 +172,29 @@ def run_cash_show_assistant():
 		if minCount == count1:
 			print("La reponse est : 1 - " + answer1)
 			if f_debug == 1:
-                                text_file.write("La reponse est : 1 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 1 - "+answer1+" ====\n\n")        #log
 		if minCount == count2:
 			print("La reponse est : 2 - " + answer2)
 			if f_debug == 1:
-                                text_file.write("La reponse est : 2 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 2 - "+answer2+" ====\n\n")        #log
 		if minCount == count3:
 			print("La reponse est : 3 - " + answer3)
 			if f_debug == 1:
-                                text_file.write("La reponse est : 3 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 3 - "+answer3+" ====\n\n")        #log
 	else:
 		maxCount = max(count1, count2, count3)
 		if maxCount == count1:
 			print("La reponse est : 1 - " + answer1)
                         if f_debug == 1:
-                                text_file.write("La reponse est : 1 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 1 - "+answer1+" ====\n\n")        #log
 		if maxCount == count2:
 			print("La reponse est : 2 - " + answer2)
 			if f_debug == 1:
-                                text_file.write("La reponse est : 2 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 2 - "+answer2)+" ====\n\n")        #log
 		if maxCount == count3:
 			print("La reponse est : 3 - " + answer3)
 			if f_debug == 1:
-                                text_file.write("La reponse est : 3 - "+str(datetime.now())+" ====\n\n")        #log
+                                text_file.write("La reponse est : 3 - "+answer3)+" ====\n\n")        #log
 
                 if f_debug == 1:
                         text_file.write("===== fermeture "+str(datetime.now())+" ====\n\n")      #log
